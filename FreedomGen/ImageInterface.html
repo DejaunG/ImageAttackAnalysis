@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Freedom Generator</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="ImageProcessing.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to Freedom Generator</h1>
+    </div>
+
+    <div class="main">
+    <form id="upload-form" enctype="multipart/form-data">
+        <div class="upload-btn-wrapper">
+            <button class="btn" type="button" onclick="document.getElementById('myFile').click();">Upload a file</button>
+            <input type="file" id="myFile" name="file" style="display:none;" onchange="submitForm()">
+        </div>
+        <div class="image-container">
+            <h2>Raw Image</h2>
+            <img id="uploaded-image" src="" alt="Uploaded image">
+        </div>
+    </form>
+    <div id="results">
+    <div class="image-container">
+        <h2>Raw Adversarial Image</h2>
+        <img id="raw-adversarial-image" src="" alt="Raw adversarial image">
+    </div>
+</div>
+</div>
+
+    <div id="response">
+
+    </div>
+
+</body>
+</html>
