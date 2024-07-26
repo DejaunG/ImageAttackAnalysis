@@ -8,11 +8,12 @@ import sys
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
-
 @app.route('/')
 def home():
     return send_from_directory('.', 'ImageInterface.html')
 
+
+# In your server.py file
 
 @app.route('/upload', methods=['POST'])
 def handle_upload():
@@ -30,7 +31,7 @@ def handle_upload():
 
     print("Running fgsm_adv.py script...")
     python_path = sys.executable  # Use the current Python interpreter
-    result = subprocess.run([python_path, 'fgsm_adv.py'],
+    result = subprocess.run([python_path, 'fgsm_adv.py', file_path],
                             capture_output=True, text=True, encoding='utf-8')
 
     print("Script stdout:", result.stdout)
@@ -38,6 +39,7 @@ def handle_upload():
 
     # Check if images were created
     image_paths = [
+        'generatedimages/adversarial_examples.png',
         'generatedimages/training_validation_plots.png',
     ]
 
@@ -50,7 +52,6 @@ def handle_upload():
         'script_error': result.stderr,
         'images': existing_images
     }), 200
-
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)

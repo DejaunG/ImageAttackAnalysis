@@ -165,3 +165,7 @@ footer {
     max-width: 100%; /* Ensures the image is responsive */
     height: auto; /* Maintains the aspect ratio */
 }
+.header img {
+    max-width: 100%;
+    height: auto;
+}
