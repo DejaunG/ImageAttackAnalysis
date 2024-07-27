@@ -1,13 +1,11 @@
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import logging
 import sys
-from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # Set up logging
 logging.basicConfig(filename='fgsm_adv.log', level=logging.INFO,
@@ -16,49 +14,95 @@ console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 logging.getLogger('').addHandler(console)
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-# Initialize lists to store metrics
-train_accuracy = []
-val_accuracy = []
-train_loss = []
-val_loss = []
+def load_custom_dataset(train_dir, val_dir, img_size=(224, 224), batch_size=8):
+    train_datagen = ImageDataGenerator(
+        preprocessing_function=preprocess_input,
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        horizontal_flip=True,
+        zoom_range=0.2
+    )
+
+    val_datagen = ImageDataGenerator(
+        preprocessing_function=preprocess_input
+    )
+
+    train_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=img_size,
+        batch_size=batch_size,
+        class_mode='categorical',
+        shuffle=True
+    )
+
+    validation_generator = val_datagen.flow_from_directory(
+        val_dir,
+        target_size=img_size,
+        batch_size=batch_size,
+        class_mode='categorical',
+        shuffle=False
+    )
+
+    return train_generator, validation_generator
 
 
-def process_single_image(image_path, model, epsilon_values=[0, 0.01, 0.1, 0.15, 0.2]):
-    logging.info(f"Processing image: {image_path}")
-    # Load and preprocess the image
-    img = load_img(image_path, target_size=(224, 224))
-    img_array = img_to_array(img)
-    img_array = preprocess_input(img_array[np.newaxis, ...])
+def create_model(num_classes):
+    base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+    for layer in base_model.layers:
+        layer.trainable = False
+    x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
+    x = tf.keras.layers.Dense(64, activation='relu')(x)
+    x = tf.keras.layers.Dropout(0.5)(x)
+    x = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
+    model = tf.keras.Model(base_model.input, x)
+    return model
 
-    # Get the original prediction
-    original_pred = model.predict(img_array)
-    original_label = decode_predictions(original_pred)[0][0]
 
-    # Generate adversarial examples
-    adversarial_examples = []
-    for epsilon in epsilon_values:
-        adv_x = generate_adversarial_example(model, img_array, epsilon)
-        adversarial_examples.append(adv_x)
+def train_model(model, train_generator, validation_generator, epochs=20):
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
 
-    # Plot and save the results
-    plt.figure(figsize=(20, 10))
-    plt.subplot(2, 3, 1)
-    plt.imshow(img)
-    plt.title(f"Original: {original_label[1]}")
+    history = {'accuracy': [], 'val_accuracy': [], 'loss': [], 'val_loss': []}
 
-    for i, (epsilon, adv_x) in enumerate(zip(epsilon_values, adversarial_examples)):
-        plt.subplot(2, 3, i + 2)
-        plt.imshow(adv_x[0] / 2 + 0.5)  # Denormalize
-        adv_pred = model.predict(adv_x)
-        adv_label = decode_predictions(adv_pred)[0][0]
-        plt.title(f"Epsilon {epsilon}: {adv_label[1]}")
+    for epoch in range(epochs):
+        logging.info(f"Epoch {epoch + 1}/{epochs}")
 
-    plt.tight_layout()
-    plt.savefig('generatedimages/adversarial_examples.png')
-    plt.close()
-    logging.info("Adversarial examples generated and saved.")
+        # Train on batches
+        train_loss = []
+        train_accuracy = []
+        for _ in range(len(train_generator)):
+            x_batch, y_batch = next(train_generator)
+            metrics = model.train_on_batch(x_batch, y_batch)
+            train_loss.append(metrics[0])
+            train_accuracy.append(metrics[1])
+
+        # Validate
+        val_loss = []
+        val_accuracy = []
+        for _ in range(len(validation_generator)):
+            x_batch, y_batch = next(validation_generator)
+            metrics = model.test_on_batch(x_batch, y_batch)
+            val_loss.append(metrics[0])
+            val_accuracy.append(metrics[1])
+
+        # Log metrics
+        train_loss = np.mean(train_loss)
+        train_accuracy = np.mean(train_accuracy)
+        val_loss = np.mean(val_loss)
+        val_accuracy = np.mean(val_accuracy)
+
+        logging.info(f"train_loss: {train_loss:.4f}, train_accuracy: {train_accuracy:.4f}")
+        logging.info(f"val_loss: {val_loss:.4f}, val_accuracy: {val_accuracy:.4f}")
+
+        history['accuracy'].append(train_accuracy)
+        history['val_accuracy'].append(val_accuracy)
+        history['loss'].append(train_loss)
+        history['val_loss'].append(val_loss)
+
+    return history
 
 
 def generate_adversarial_example(model, image, epsilon):
@@ -73,132 +117,85 @@ def generate_adversarial_example(model, image, epsilon):
     return tf.clip_by_value(adversarial_example, -1, 1)
 
 
-def create_adversarial_pattern(input_image, input_label):
-    input_image = tf.convert_to_tensor(input_image, dtype=tf.float32)
-    input_label = tf.convert_to_tensor(input_label, dtype=tf.float32)
-    with tf.GradientTape() as tape:
-        tape.watch(input_image)
-        prediction = model(input_image)
-        loss = loss_object(input_label, prediction)
-    gradient = tape.gradient(loss, input_image)
-    signed_grad = tf.sign(gradient)
-    return signed_grad
+def process_single_image(image_path, model, epsilon_values=[0, 0.01, 0.1, 0.15, 0.2]):
+    logging.info(f"Processing image: {image_path}")
+    img = tf.keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
+    img_array = tf.keras.preprocessing.image.img_to_array(img)
+    img_array = preprocess_input(img_array[np.newaxis, ...])
+
+    original_pred = model.predict(img_array)
+    class_names = ['fresh', 'non-fresh']  # Update these to match your actual class names
+    original_label = class_names[np.argmax(original_pred)]
+    original_prob = np.max(original_pred)
+
+    adversarial_examples = []
+    for epsilon in epsilon_values:
+        adv_x = generate_adversarial_example(model, img_array, epsilon)
+        adversarial_examples.append(adv_x)
+
+    plt.figure(figsize=(20, 10))
+    plt.subplot(2, 3, 1)
+    plt.imshow(img)
+    plt.title(f"Original: {original_label} ({original_prob:.2f})")
+
+    for i, (epsilon, adv_x) in enumerate(zip(epsilon_values, adversarial_examples)):
+        plt.subplot(2, 3, i + 2)
+        plt.imshow(adv_x[0] / 2 + 0.5)  # Denormalize
+        adv_pred = model.predict(adv_x)
+        adv_label = class_names[np.argmax(adv_pred)]
+        adv_prob = np.max(adv_pred)
+        plt.title(f"Epsilon {epsilon}: {adv_label} ({adv_prob:.2f})")
+
+    plt.tight_layout()
+    plt.savefig('generatedimages/adversarial_examples.png')
+    plt.close()
+    logging.info("Adversarial examples generated and saved.")
 
 
-def generate_adversarial_examples(x, y, epsilon):
-    x = tf.convert_to_tensor(x, dtype=tf.float32)
-    y = tf.convert_to_tensor(y, dtype=tf.float32)
-    x_adv = create_adversarial_pattern(x, y)
-    x_adv = tf.clip_by_value(x + epsilon * tf.sign(x_adv), -1, 1)
-    return x_adv
-
-
-def adversarial_train(epochs=2, epsilon=0.01, num_samples=5000):
-    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
-
-    # Use only a subset of the data
-    x_train = x_train[:num_samples]
-    y_train = y_train[:num_samples]
-    x_test = x_test[:1000]
-    y_test = y_test[:1000]
-
-    x_train = preprocess_input(x_train.astype('float32'))
-    x_test = preprocess_input(x_test.astype('float32'))
-    y_train = to_categorical(y_train, 10)
-    y_test = to_categorical(y_test, 10)
-
-    for epoch in range(epochs):
-        logging.info(f"Epoch {epoch + 1}/{epochs}")
-
-        # Train on batches
-        batch_train_loss = []
-        batch_train_accuracy = []
-        for i in range(0, len(x_train), 32):
-            if i % 320 == 0:  # Log every 10 batches
-                logging.info(f"Processing batch {i // 32 + 1}/{len(x_train) // 32}")
-
-            x_batch = x_train[i:i + 32]
-            y_batch = y_train[i:i + 32]
-
-            # Generate adversarial examples
-            adv_x = generate_adversarial_examples(x_batch, y_batch, epsilon)
-
-            # Train on clean and adversarial examples
-            history = model.fit(
-                tf.concat([x_batch, adv_x], axis=0),
-                tf.concat([y_batch, y_batch], axis=0),
-                epochs=1,
-                verbose=0
-            )
-            batch_train_loss.append(history.history['loss'][0])
-            batch_train_accuracy.append(history.history['accuracy'][0])
-
-        # Evaluate on validation set
-        val_loss_value, val_accuracy_value = model.evaluate(x_test, y_test, verbose=0)
-
-        # Store metrics
-        train_accuracy.append(np.mean(batch_train_accuracy))
-        train_loss.append(np.mean(batch_train_loss))
-        val_accuracy.append(val_accuracy_value)
-        val_loss.append(val_loss_value)
-
-        logging.info(f"Train Accuracy: {train_accuracy[-1]:.4f}, Validation Accuracy: {val_accuracy[-1]:.4f}")
-        logging.info(f"Train Loss: {train_loss[-1]:.4f}, Validation Loss: {val_loss[-1]:.4f}")
-
-
-def plot_metrics():
+def plot_training_history(history):
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
-    plt.plot(train_accuracy, label='Training Accuracy')
-    plt.plot(val_accuracy, label='Validation Accuracy')
-    plt.title('Training and Validation Accuracy')
+    plt.plot(history['accuracy'], label='Training Accuracy')
+    plt.plot(history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Model Accuracy')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(train_loss, label='Training Loss')
-    plt.plot(val_loss, label='Validation Loss')
-    plt.title('Training and Validation Loss')
+    plt.plot(history['loss'], label='Training Loss')
+    plt.plot(history['val_loss'], label='Validation Loss')
+    plt.title('Model Loss')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('generatedimages/training_validation_plots.png')
+    plt.savefig('generatedimages/training_history.png')
     plt.close()
 
 
-def main(uploaded_image_path):
+def main(train_dir, val_dir, uploaded_image_path):
     try:
-        logging.info("Loading MobileNetV2 model...")
-        global model, loss_object
+        logging.info("Loading custom dataset...")
+        train_generator, validation_generator = load_custom_dataset(train_dir, val_dir)
 
-        # Load the base model for adversarial example generation
-        base_model = MobileNetV2(weights='imagenet')
+        num_classes = len(train_generator.class_indices)
+        logging.info(f"Number of classes: {num_classes}")
 
-        # Process the uploaded image
+        logging.info("Creating and training model...")
+        model = create_model(num_classes)
+        history = train_model(model, train_generator, validation_generator)
+
+        logging.info("Generating and saving training plots...")
+        plot_training_history(history)
+
         if os.path.exists(uploaded_image_path):
-            process_single_image(uploaded_image_path, base_model)
+            logging.info("Processing uploaded image...")
+            process_single_image(uploaded_image_path, model)
         else:
             logging.warning(f"Uploaded image not found at {uploaded_image_path}")
-
-        # Create a new model for adversarial training
-        base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
-        x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
-        x = tf.keras.layers.Dense(10, activation='softmax')(x)
-        model = tf.keras.Model(base_model.input, x)
-
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-        loss_object = tf.keras.losses.CategoricalCrossentropy()
-
-        logging.info("Starting adversarial training...")
-        adversarial_train(epochs=2, epsilon=0.01, num_samples=5000)
-
-        logging.info("Generating and saving plots...")
-        plot_metrics()
 
         logging.info("Script completed successfully.")
     except Exception as e:
@@ -207,13 +204,11 @@ def main(uploaded_image_path):
 
 
 if __name__ == "__main__":
-    try:
-        if len(sys.argv) > 1:
-            uploaded_image_path = sys.argv[1]
-            main(uploaded_image_path)
-        else:
-            logging.error("No image path provided")
-            sys.exit(1)
-    except Exception as e:
-        logging.error(f"Script failed: {str(e)}")
+    if len(sys.argv) != 4:
+        print("Usage: python fgsm_adv.py <train_dir> <val_dir> <uploaded_image_path>")
         sys.exit(1)
+
+    train_dir = sys.argv[1]
+    val_dir = sys.argv[2]
+    uploaded_image_path = sys.argv[3]
+    main(train_dir, val_dir, uploaded_image_path)

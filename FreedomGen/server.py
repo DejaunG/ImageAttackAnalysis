@@ -31,7 +31,9 @@ def handle_upload():
 
     print("Running fgsm_adv.py script...")
     python_path = sys.executable  # Use the current Python interpreter
-    result = subprocess.run([python_path, 'fgsm_adv.py', file_path],
+    train_dir = 'Fish-DataSets/fish/train'
+    val_dir = 'Fish-DataSets/fish/val'
+    result = subprocess.run([python_path, 'fgsm_adv.py', train_dir, val_dir, file_path],
                             capture_output=True, text=True, encoding='utf-8')
 
     print("Script stdout:", result.stdout)
@@ -40,18 +42,24 @@ def handle_upload():
     # Check if images were created
     image_paths = [
         'generatedimages/adversarial_examples.png',
-        'generatedimages/training_validation_plots.png',
+        'generatedimages/training_history.png',
     ]
 
     existing_images = [path for path in image_paths if os.path.exists(path)]
 
+    if result.returncode != 0:
+        return jsonify({
+            'error': 'Script failed',
+            'script_output': result.stdout,
+            'script_error': result.stderr
+        }), 500
+
     return jsonify({
-        'message': 'File successfully uploaded',
+        'message': 'File successfully uploaded and processed',
         'filename': filename,
         'script_output': result.stdout,
         'script_error': result.stderr,
         'images': existing_images
     }), 200
-
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)

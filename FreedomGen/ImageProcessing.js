@@ -8,7 +8,7 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
-            // In the success function of your AJAX call
+            // In the success function of the AJAX call
             success: function(data) {
                 console.log('Server response:', data);
                 $('#uploaded-image').attr('src', '/uploads/' + data.filename);
