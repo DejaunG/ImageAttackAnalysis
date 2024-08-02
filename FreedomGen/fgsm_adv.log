@@ -1848,3 +1848,147 @@
 2024-07-26 07:48:54,372 - INFO - Processing image: uploads/20200517_145253.jpg
 2024-07-26 07:48:58,298 - INFO - Adversarial examples generated and saved.
 2024-07-26 07:48:58,298 - INFO - Script completed successfully.
+2024-07-27 17:58:20,813 - INFO - Loading custom dataset...
+2024-07-27 17:58:20,886 - INFO - Number of classes: 2
+2024-07-27 17:58:20,886 - INFO - Creating and training model...
+2024-07-27 17:58:21,668 - INFO - Epoch 1/20
+2024-07-27 17:58:29,952 - INFO - train_loss: 2.0580, train_accuracy: 0.4375
+2024-07-27 17:58:29,954 - INFO - val_loss: 1.3494, val_accuracy: 0.5626
+2024-07-27 17:58:29,954 - INFO - Epoch 2/20
+2024-07-27 17:58:31,680 - WARNING - 5 out of the last 5 calls to <function TensorFlowTrainer.make_train_function.<locals>.one_step_on_iterator at 0x17bcdd4c0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 17:58:32,286 - WARNING - 6 out of the last 6 calls to <function TensorFlowTrainer.make_train_function.<locals>.one_step_on_iterator at 0x17bcdd4c0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 17:58:33,746 - WARNING - 5 out of the last 5 calls to <function TensorFlowTrainer.make_test_function.<locals>.one_step_on_iterator at 0x17cc4baf0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 17:58:34,489 - WARNING - 6 out of the last 6 calls to <function TensorFlowTrainer.make_test_function.<locals>.one_step_on_iterator at 0x17cc4baf0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 17:58:34,490 - INFO - train_loss: 1.2639, train_accuracy: 0.5313
+2024-07-27 17:58:34,490 - INFO - val_loss: 1.1633, val_accuracy: 0.5362
+2024-07-27 17:58:34,490 - INFO - Epoch 3/20
+2024-07-27 17:58:39,993 - INFO - train_loss: 1.1776, train_accuracy: 0.5173
+2024-07-27 17:58:39,993 - INFO - val_loss: 1.0974, val_accuracy: 0.5496
+2024-07-27 17:58:39,993 - INFO - Epoch 4/20
+2024-07-27 17:58:46,729 - INFO - train_loss: 1.0967, train_accuracy: 0.5322
+2024-07-27 17:58:46,730 - INFO - val_loss: 1.0521, val_accuracy: 0.5432
+2024-07-27 17:58:46,730 - INFO - Epoch 5/20
+2024-07-27 17:58:56,047 - INFO - train_loss: 1.0448, train_accuracy: 0.5534
+2024-07-27 17:58:56,047 - INFO - val_loss: 1.0148, val_accuracy: 0.5685
+2024-07-27 17:58:56,048 - INFO - Epoch 6/20
+2024-07-27 17:59:03,437 - INFO - train_loss: 0.9873, train_accuracy: 0.5714
+2024-07-27 17:59:03,437 - INFO - val_loss: 0.9540, val_accuracy: 0.5866
+2024-07-27 17:59:03,438 - INFO - Epoch 7/20
+2024-07-27 17:59:07,256 - INFO - train_loss: 0.9325, train_accuracy: 0.5981
+2024-07-27 17:59:07,256 - INFO - val_loss: 0.9081, val_accuracy: 0.6104
+2024-07-27 17:59:07,256 - INFO - Epoch 8/20
+2024-07-27 17:59:11,508 - INFO - train_loss: 0.8995, train_accuracy: 0.6131
+2024-07-27 17:59:11,508 - INFO - val_loss: 0.8697, val_accuracy: 0.6282
+2024-07-27 17:59:11,508 - INFO - Epoch 9/20
+2024-07-27 17:59:15,273 - INFO - train_loss: 0.8481, train_accuracy: 0.6354
+2024-07-27 17:59:15,273 - INFO - val_loss: 0.8217, val_accuracy: 0.6475
+2024-07-27 17:59:15,273 - INFO - Epoch 10/20
+2024-07-27 17:59:19,300 - INFO - train_loss: 0.8196, train_accuracy: 0.6521
+2024-07-27 17:59:19,300 - INFO - val_loss: 0.8023, val_accuracy: 0.6605
+2024-07-27 17:59:19,300 - INFO - Epoch 11/20
+2024-07-27 17:59:23,302 - INFO - train_loss: 0.7930, train_accuracy: 0.6680
+2024-07-27 17:59:23,302 - INFO - val_loss: 0.7761, val_accuracy: 0.6756
+2024-07-27 17:59:23,302 - INFO - Epoch 12/20
+2024-07-27 17:59:27,450 - INFO - train_loss: 0.7806, train_accuracy: 0.6708
+2024-07-27 17:59:27,450 - INFO - val_loss: 0.7663, val_accuracy: 0.6756
+2024-07-27 17:59:27,450 - INFO - Epoch 13/20
+2024-07-27 17:59:31,351 - INFO - train_loss: 0.7598, train_accuracy: 0.6792
+2024-07-27 17:59:31,351 - INFO - val_loss: 0.7439, val_accuracy: 0.6852
+2024-07-27 17:59:31,352 - INFO - Epoch 14/20
+2024-07-27 17:59:35,301 - INFO - train_loss: 0.7330, train_accuracy: 0.6889
+2024-07-27 17:59:35,302 - INFO - val_loss: 0.7200, val_accuracy: 0.6929
+2024-07-27 17:59:35,302 - INFO - Epoch 15/20
+2024-07-27 17:59:39,145 - INFO - train_loss: 0.7170, train_accuracy: 0.6960
+2024-07-27 17:59:39,145 - INFO - val_loss: 0.6998, val_accuracy: 0.7046
+2024-07-27 17:59:39,145 - INFO - Epoch 16/20
+2024-07-27 17:59:43,396 - INFO - train_loss: 0.6900, train_accuracy: 0.7093
+2024-07-27 17:59:43,396 - INFO - val_loss: 0.6766, val_accuracy: 0.7169
+2024-07-27 17:59:43,396 - INFO - Epoch 17/20
+2024-07-27 17:59:47,154 - INFO - train_loss: 0.6711, train_accuracy: 0.7179
+2024-07-27 17:59:47,154 - INFO - val_loss: 0.6588, val_accuracy: 0.7233
+2024-07-27 17:59:47,154 - INFO - Epoch 18/20
+2024-07-27 17:59:51,367 - INFO - train_loss: 0.6467, train_accuracy: 0.7294
+2024-07-27 17:59:51,367 - INFO - val_loss: 0.6355, val_accuracy: 0.7355
+2024-07-27 17:59:51,367 - INFO - Epoch 19/20
+2024-07-27 17:59:55,539 - INFO - train_loss: 0.6256, train_accuracy: 0.7409
+2024-07-27 17:59:55,539 - INFO - val_loss: 0.6136, val_accuracy: 0.7469
+2024-07-27 17:59:55,539 - INFO - Epoch 20/20
+2024-07-27 17:59:59,716 - INFO - train_loss: 0.6044, train_accuracy: 0.7496
+2024-07-27 17:59:59,716 - INFO - val_loss: 0.5955, val_accuracy: 0.7533
+2024-07-27 17:59:59,716 - INFO - Generating and saving training plots...
+2024-07-27 18:00:00,607 - INFO - Processing uploaded image...
+2024-07-27 18:00:00,608 - INFO - Processing image: uploads/20200517_084741.jpg
+2024-07-27 18:00:05,709 - INFO - Adversarial examples generated and saved.
+2024-07-27 18:00:05,709 - INFO - Script completed successfully.
+2024-07-27 18:07:39,168 - INFO - Loading custom dataset...
+2024-07-27 18:07:39,189 - INFO - Number of classes: 2
+2024-07-27 18:07:39,189 - INFO - Creating and training model...
+2024-07-27 18:07:39,918 - INFO - Epoch 1/20
+2024-07-27 18:07:51,737 - INFO - train_loss: 1.7650, train_accuracy: 0.4000
+2024-07-27 18:07:51,738 - INFO - val_loss: 1.2083, val_accuracy: 0.4776
+2024-07-27 18:07:51,738 - INFO - Epoch 2/20
+2024-07-27 18:07:53,732 - WARNING - 5 out of the last 5 calls to <function TensorFlowTrainer.make_train_function.<locals>.one_step_on_iterator at 0x300bdb4c0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 18:07:54,524 - WARNING - 6 out of the last 6 calls to <function TensorFlowTrainer.make_train_function.<locals>.one_step_on_iterator at 0x300bdb4c0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 18:07:56,366 - WARNING - 5 out of the last 5 calls to <function TensorFlowTrainer.make_test_function.<locals>.one_step_on_iterator at 0x301d4caf0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 18:07:57,063 - WARNING - 6 out of the last 6 calls to <function TensorFlowTrainer.make_test_function.<locals>.one_step_on_iterator at 0x301d4caf0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2024-07-27 18:07:57,063 - INFO - train_loss: 1.2246, train_accuracy: 0.4492
+2024-07-27 18:07:57,063 - INFO - val_loss: 1.1186, val_accuracy: 0.4746
+2024-07-27 18:07:57,063 - INFO - Epoch 3/20
+2024-07-27 18:08:00,969 - INFO - train_loss: 1.2046, train_accuracy: 0.4576
+2024-07-27 18:08:00,969 - INFO - val_loss: 1.1397, val_accuracy: 0.4623
+2024-07-27 18:08:00,969 - INFO - Epoch 4/20
+2024-07-27 18:08:08,178 - INFO - train_loss: 1.1143, train_accuracy: 0.4803
+2024-07-27 18:08:08,179 - INFO - val_loss: 1.0914, val_accuracy: 0.4868
+2024-07-27 18:08:08,179 - INFO - Epoch 5/20
+2024-07-27 18:08:13,731 - INFO - train_loss: 1.1065, train_accuracy: 0.4866
+2024-07-27 18:08:13,731 - INFO - val_loss: 1.0615, val_accuracy: 0.4963
+2024-07-27 18:08:13,731 - INFO - Epoch 6/20
+2024-07-27 18:08:17,936 - INFO - train_loss: 1.0507, train_accuracy: 0.5017
+2024-07-27 18:08:17,937 - INFO - val_loss: 1.0296, val_accuracy: 0.5169
+2024-07-27 18:08:17,937 - INFO - Epoch 7/20
+2024-07-27 18:08:22,246 - INFO - train_loss: 0.9988, train_accuracy: 0.5314
+2024-07-27 18:08:22,246 - INFO - val_loss: 0.9631, val_accuracy: 0.5508
+2024-07-27 18:08:22,246 - INFO - Epoch 8/20
+2024-07-27 18:08:26,294 - INFO - train_loss: 0.9291, train_accuracy: 0.5689
+2024-07-27 18:08:26,294 - INFO - val_loss: 0.8988, val_accuracy: 0.5889
+2024-07-27 18:08:26,294 - INFO - Epoch 9/20
+2024-07-27 18:08:30,816 - INFO - train_loss: 0.8928, train_accuracy: 0.5926
+2024-07-27 18:08:30,816 - INFO - val_loss: 0.8678, val_accuracy: 0.6099
+2024-07-27 18:08:30,817 - INFO - Epoch 10/20
+2024-07-27 18:08:35,727 - INFO - train_loss: 0.8512, train_accuracy: 0.6156
+2024-07-27 18:08:35,728 - INFO - val_loss: 0.8280, val_accuracy: 0.6317
+2024-07-27 18:08:35,728 - INFO - Epoch 11/20
+2024-07-27 18:08:41,200 - INFO - train_loss: 0.8191, train_accuracy: 0.6343
+2024-07-27 18:08:41,201 - INFO - val_loss: 0.8044, val_accuracy: 0.6426
+2024-07-27 18:08:41,201 - INFO - Epoch 12/20
+2024-07-27 18:08:45,644 - INFO - train_loss: 0.7964, train_accuracy: 0.6452
+2024-07-27 18:08:45,644 - INFO - val_loss: 0.7796, val_accuracy: 0.6559
+2024-07-27 18:08:45,644 - INFO - Epoch 13/20
+2024-07-27 18:08:50,820 - INFO - train_loss: 0.7670, train_accuracy: 0.6617
+2024-07-27 18:08:50,821 - INFO - val_loss: 0.7521, val_accuracy: 0.6710
+2024-07-27 18:08:50,821 - INFO - Epoch 14/20
+2024-07-27 18:08:55,094 - INFO - train_loss: 0.7481, train_accuracy: 0.6714
+2024-07-27 18:08:55,094 - INFO - val_loss: 0.7334, val_accuracy: 0.6803
+2024-07-27 18:08:55,094 - INFO - Epoch 15/20
+2024-07-27 18:08:59,024 - INFO - train_loss: 0.7209, train_accuracy: 0.6862
+2024-07-27 18:08:59,024 - INFO - val_loss: 0.7057, val_accuracy: 0.6951
+2024-07-27 18:08:59,024 - INFO - Epoch 16/20
+2024-07-27 18:09:03,039 - INFO - train_loss: 0.7054, train_accuracy: 0.6952
+2024-07-27 18:09:03,040 - INFO - val_loss: 0.6950, val_accuracy: 0.7017
+2024-07-27 18:09:03,040 - INFO - Epoch 17/20
+2024-07-27 18:09:07,246 - INFO - train_loss: 0.6862, train_accuracy: 0.7052
+2024-07-27 18:09:07,247 - INFO - val_loss: 0.6743, val_accuracy: 0.7119
+2024-07-27 18:09:07,247 - INFO - Epoch 18/20
+2024-07-27 18:09:11,561 - INFO - train_loss: 0.6663, train_accuracy: 0.7159
+2024-07-27 18:09:11,561 - INFO - val_loss: 0.6583, val_accuracy: 0.7211
+2024-07-27 18:09:11,561 - INFO - Epoch 19/20
+2024-07-27 18:09:15,611 - INFO - train_loss: 0.6495, train_accuracy: 0.7228
+2024-07-27 18:09:15,612 - INFO - val_loss: 0.6395, val_accuracy: 0.7279
+2024-07-27 18:09:15,612 - INFO - Epoch 20/20
+2024-07-27 18:09:20,292 - INFO - train_loss: 0.6333, train_accuracy: 0.7306
+2024-07-27 18:09:20,292 - INFO - val_loss: 0.6259, val_accuracy: 0.7353
+2024-07-27 18:09:20,292 - INFO - Generating and saving training plots...
+2024-07-27 18:09:20,702 - INFO - Processing uploaded image...
+2024-07-27 18:09:20,702 - INFO - Processing image: uploads/20200517_084438.jpg
+2024-07-27 18:09:24,211 - INFO - Adversarial examples generated and saved.
+2024-07-27 18:09:24,212 - INFO - Script completed successfully.
