@@ -14,7 +14,6 @@ console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 logging.getLogger('').addHandler(console)
 
-
 def load_custom_dataset(train_dir, val_dir, img_size=(224, 224), batch_size=8):
     train_datagen = ImageDataGenerator(
         preprocessing_function=preprocess_input,
@@ -47,7 +46,6 @@ def load_custom_dataset(train_dir, val_dir, img_size=(224, 224), batch_size=8):
 
     return train_generator, validation_generator
 
-
 def create_model(num_classes):
     base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
     for layer in base_model.layers:
@@ -58,7 +56,6 @@ def create_model(num_classes):
     x = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
     model = tf.keras.Model(base_model.input, x)
     return model
-
 
 def train_model(model, train_generator, validation_generator, epochs=20):
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
@@ -104,7 +101,6 @@ def train_model(model, train_generator, validation_generator, epochs=20):
 
     return history
 
-
 def generate_adversarial_example(model, image, epsilon):
     image_tensor = tf.convert_to_tensor(image)
     with tf.GradientTape() as tape:
@@ -115,42 +111,6 @@ def generate_adversarial_example(model, image, epsilon):
     signed_grad = tf.sign(gradient)
     adversarial_example = image_tensor + epsilon * signed_grad
     return tf.clip_by_value(adversarial_example, -1, 1)
-
-
-def process_single_image(image_path, model, epsilon_values=[0, 0.01, 0.1, 0.15, 0.2]):
-    logging.info(f"Processing image: {image_path}")
-    img = tf.keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
-    img_array = preprocess_input(img_array[np.newaxis, ...])
-
-    original_pred = model.predict(img_array)
-    class_names = ['fresh', 'non-fresh']  # Update these to match your actual class names
-    original_label = class_names[np.argmax(original_pred)]
-    original_prob = np.max(original_pred)
-
-    adversarial_examples = []
-    for epsilon in epsilon_values:
-        adv_x = generate_adversarial_example(model, img_array, epsilon)
-        adversarial_examples.append(adv_x)
-
-    plt.figure(figsize=(20, 10))
-    plt.subplot(2, 3, 1)
-    plt.imshow(img)
-    plt.title(f"Original: {original_label} ({original_prob:.2f})")
-
-    for i, (epsilon, adv_x) in enumerate(zip(epsilon_values, adversarial_examples)):
-        plt.subplot(2, 3, i + 2)
-        plt.imshow(adv_x[0] / 2 + 0.5)  # Denormalize
-        adv_pred = model.predict(adv_x)
-        adv_label = class_names[np.argmax(adv_pred)]
-        adv_prob = np.max(adv_pred)
-        plt.title(f"Epsilon {epsilon}: {adv_label} ({adv_prob:.2f})")
-
-    plt.tight_layout()
-    plt.savefig('generatedimages/adversarial_examples.png')
-    plt.close()
-    logging.info("Adversarial examples generated and saved.")
-
 
 def plot_training_history(history):
     plt.figure(figsize=(12, 5))
@@ -175,6 +135,50 @@ def plot_training_history(history):
     plt.savefig('generatedimages/training_history.png')
     plt.close()
 
+def process_single_image(image_path, model, epsilon_values=[0, 0.01, 0.1, 0.15, 0.2]):
+    logging.info(f"Processing image: {image_path}")
+    img = tf.keras.preprocessing.image.load_img(image_path, target_size=(224, 224))
+    img_array = tf.keras.preprocessing.image.img_to_array(img)
+    img_array = preprocess_input(img_array[np.newaxis, ...])
+
+    original_pred = model.predict(img_array)
+    class_names = ['fresh', 'non-fresh']  # Update these to match your actual class names
+    original_label = class_names[np.argmax(original_pred)]
+    original_prob = np.max(original_pred)
+
+    adversarial_examples = []
+    for epsilon in epsilon_values:
+        adv_x = generate_adversarial_example(model, img_array, epsilon)
+        adversarial_examples.append(adv_x)
+
+        # Save individual adversarial image
+        plt.figure(figsize=(5, 5))
+        plt.imshow(adv_x[0] / 2 + 0.5)  # Denormalize
+        adv_pred = model.predict(adv_x)
+        adv_label = class_names[np.argmax(adv_pred)]
+        adv_prob = np.max(adv_pred)
+        plt.title(f"Epsilon {epsilon}: {adv_label} ({adv_prob:.2f})")
+        plt.axis('off')
+        plt.savefig(f'generatedimages/adversarial_epsilon_{epsilon}.png', bbox_inches='tight')
+        plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.subplot(2, 3, 1)
+    plt.imshow(img)
+    plt.title(f"Original: {original_label} ({original_prob:.2f})")
+
+    for i, (epsilon, adv_x) in enumerate(zip(epsilon_values, adversarial_examples)):
+        plt.subplot(2, 3, i + 2)
+        plt.imshow(adv_x[0] / 2 + 0.5)  # Denormalize
+        adv_pred = model.predict(adv_x)
+        adv_label = class_names[np.argmax(adv_pred)]
+        adv_prob = np.max(adv_pred)
+        plt.title(f"Epsilon {epsilon}: {adv_label} ({adv_prob:.2f})")
+
+    plt.tight_layout()
+    plt.savefig('generatedimages/adversarial_examples.png')
+    plt.close()
+    logging.info("Adversarial examples generated and saved.")
 
 def main(train_dir, val_dir, uploaded_image_path):
     try:
@@ -201,7 +205,6 @@ def main(train_dir, val_dir, uploaded_image_path):
     except Exception as e:
         logging.error(f"An error occurred: {str(e)}")
         raise
-
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
