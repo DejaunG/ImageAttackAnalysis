@@ -1,3 +1,4 @@
+import scipy
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
