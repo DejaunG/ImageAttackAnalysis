@@ -40,39 +40,33 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(data) {
-                console.log('Server response:', data);
-                $(imageSelector).attr('src', '/uploads/' + data.filename).hide().fadeIn();
+    console.log('Server response:', data);
+    $(imageSelector).attr('src', '/uploads/' + data.filename).hide().fadeIn();
 
-                // Clear previous results
-                $(resultsSelector).empty();
+    // Clear previous results
+    $(resultsSelector).empty();
 
-                // Display results
-                data.images.forEach(function(image, index) {
-                    if (image.includes('adversarial_examples.png')) {
-                        $(resultsSelector).append(`
-                            <img src="/${image}" alt="Adversarial Examples" class="img-fluid mb-3">
-                        `).hide().fadeIn();
-                    } else if (image.includes('training_history.png') && historySelector) {
-                        $(historySelector).attr('src', '/' + image).hide().fadeIn();
-                    } else if (image.includes('detected_reverted.png')) {
-                        $(resultsSelector).append(`
-                            <img src="/${image}" alt="Detected and Reverted Image" class="img-fluid mb-3">
-                        `).hide().fadeIn();
-                    }
-                });
+    // Display results
+    data.images.forEach(function(image, index) {
+        if (image.includes('detected_reverted.png')) {
+            $(resultsSelector).append(`
+                <img src="/${image}" alt="Detected and Reverted Image" class="img-fluid mb-3">
+            `).hide().fadeIn();
+        }
+    });
 
-                // Display adversarial detection result
-                if (data.adversarial_result) {
-                    $(resultsSelector).append(`
-                        <div class="adversarial-result">
-                            <h3>Adversarial Detection Result</h3>
-                            <p class="mb-0">${data.adversarial_result}</p>
-                        </div>
-                    `).hide().fadeIn();
-                }
+    // Display adversarial detection result
+    if (data.adversarial_result) {
+        $(resultsSelector).append(`
+            <div class="adversarial-result">
+                <h3>Adversarial Detection Result</h3>
+                <pre>${data.adversarial_result}</pre>
+            </div>
+        `).hide().fadeIn();
+    }
 
-                console.log('Success:', data);
-            },
+    console.log('Success:', data);
+},
             error: function(xhr, status, error) {
                 $('#response').html(`<strong>Error:</strong> ${xhr.responseText}`).fadeIn().delay(3000).fadeOut();
                 console.log('Error:', error);

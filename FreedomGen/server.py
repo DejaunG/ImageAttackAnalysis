@@ -94,10 +94,12 @@ def handle_detect():
     existing_images = ['uploads/' + filename] + [path for path in image_paths if os.path.exists(path)]
 
     # Extract the adversarial detection result
-    adversarial_result = "Unknown"
+    detection_result = "Unknown"
     for line in result.stdout.split('\n'):
-        if line.startswith("Is the image adversarial?"):
-            adversarial_result = line.strip()
+        if line.startswith("Original image:"):
+            detection_result = line + "\n"  # Start with the original image result
+        elif line.startswith("Reverted image:"):
+            detection_result += line  # Add the reverted image result
             break
 
     if result.returncode != 0:
@@ -113,7 +115,7 @@ def handle_detect():
         'script_output': result.stdout,
         'script_error': result.stderr,
         'images': existing_images,
-        'adversarial_result': adversarial_result
+        'adversarial_result': detection_result
     }), 200
 
 @app.route('/uploads/<filename>')

@@ -3,6 +3,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image, ImageEnhance, ImageFilter
 import os
 import logging
 import sys
@@ -90,8 +91,31 @@ def load_and_preprocess_image(image_path):
     return img_array
 
 
+def revert_image(image):
+    # Convert to PIL Image
+    img_pil = Image.fromarray(np.uint8(image[0] * 127.5 + 127.5))
+
+    # Apply a slight Gaussian blur to reduce noise
+    img_pil = img_pil.filter(ImageFilter.GaussianBlur(radius=0.5))
+
+    # Enhance sharpness
+    enhancer = ImageEnhance.Sharpness(img_pil)
+    img_pil = enhancer.enhance(1.5)
+
+    # Enhance contrast slightly
+    enhancer = ImageEnhance.Contrast(img_pil)
+    img_pil = enhancer.enhance(1.2)
+
+    # Convert back to numpy array and normalize
+    reverted_image = np.array(img_pil, dtype=np.float32)
+    reverted_image = (reverted_image - 127.5) / 127.5
+    reverted_image = np.expand_dims(reverted_image, axis=0)
+
+    return reverted_image
+
+
 def detect_and_revert(model, image):
-    # Predict the class of the image
+    # Predict the class of the original image
     prediction = model.predict(image)
     class_index = np.argmax(prediction)
 
@@ -99,10 +123,15 @@ def detect_and_revert(model, image):
     is_adversarial = class_index == 1
     confidence = prediction[0][class_index]
 
-    # For now, we're not actually reverting the image
-    reverted_image = image
+    # Revert the image
+    reverted_image = revert_image(image)
 
-    return is_adversarial, confidence, reverted_image
+    # Predict the class of the reverted image
+    reverted_prediction = model.predict(reverted_image)
+    reverted_class_index = np.argmax(reverted_prediction)
+    reverted_confidence = reverted_prediction[0][reverted_class_index]
+
+    return is_adversarial, confidence, reverted_image, reverted_class_index == 0, reverted_confidence
 
 
 def main(train_dir, val_dir, uploaded_image_path):
@@ -121,20 +150,23 @@ def main(train_dir, val_dir, uploaded_image_path):
         image = load_and_preprocess_image(uploaded_image_path)
 
         logging.info("Detecting and reverting tampering...")
-        is_adversarial, confidence, reverted_image = detect_and_revert(model, image)
-
-        # Log and print the result
-        result = "Yes" if is_adversarial else "No"
-        logging.info(f"Is the image adversarial? {result} (Confidence: {confidence:.2f})")
-        print(f"Is the image adversarial? {result} (Confidence: {confidence:.2f})")
+        is_adversarial, confidence, reverted_image, is_reverted_normal, reverted_confidence = detect_and_revert(model,
+                                                                                                                image)
+        # Log and print the results
+        original_result = "Adversarial" if is_adversarial else "Normal"
+        reverted_result = "Normal" if is_reverted_normal else "Adversarial"
+        logging.info(f"Original image classification: {original_result} (Confidence: {confidence:.2f})")
+        logging.info(f"Reverted image classification: {reverted_result} (Confidence: {reverted_confidence:.2f})")
+        print(f"Original image classification: {original_result} (Confidence: {confidence:.2f})")
+        print(f"Reverted image classification: {reverted_result} (Confidence: {reverted_confidence:.2f})")
 
         plt.figure(figsize=(10, 5))
         plt.subplot(1, 2, 1)
         plt.imshow(image[0] / 2 + 0.5)  # Denormalize
-        plt.title("Uploaded Image")
+        plt.title(f"Original Image\n{original_result} (Conf: {confidence:.2f})")
         plt.subplot(1, 2, 2)
         plt.imshow(reverted_image[0] / 2 + 0.5)  # Denormalize
-        plt.title(f"{'Adversarial' if is_adversarial else 'Normal'} Image\nConfidence: {confidence:.2f}")
+        plt.title(f"Reverted Image\n{reverted_result} (Conf: {reverted_confidence:.2f})")
         plt.savefig('generatedimages/detected_reverted.png')
         plt.close()
 

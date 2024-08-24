@@ -2856,3 +2856,7 @@
 2024-08-06 15:09:37,334 - INFO - Processing image: uploads/adversarial_epsilon_0.15.png
 2024-08-06 15:09:48,122 - INFO - Adversarial examples generated and saved.
 2024-08-06 15:09:48,122 - INFO - Script completed successfully.
+2024-08-23 09:34:28,877 - INFO - Loading custom dataset...
+2024-08-23 09:34:28,949 - INFO - Number of classes: 2
+2024-08-23 09:34:28,949 - INFO - Creating and training model...
+2024-08-23 09:34:29,631 - INFO - Epoch 1/20
