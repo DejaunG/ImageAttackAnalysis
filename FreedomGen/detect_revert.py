@@ -7,7 +7,6 @@ from PIL import Image, ImageEnhance, ImageFilter
 import os
 import logging
 import sys
-import time
 
 # Set up logging
 logging.basicConfig(filename='detect_revert.log', level=logging.INFO,
@@ -153,20 +152,13 @@ def main(train_dir, val_dir, uploaded_image_path):
         logging.info("Detecting and reverting tampering...")
         is_adversarial, confidence, reverted_image, is_reverted_normal, reverted_confidence = detect_and_revert(model,
                                                                                                                 image)
-
-        # Create a unique filename using a timestamp
-        timestamp = int(time.time())
-        output_filename = f'detected_result_{timestamp}.png'
-        output_path = os.path.join('generatedimages', output_filename)
-
         # Log and print the results
         original_result = "Adversarial" if is_adversarial else "Normal"
         reverted_result = "Normal" if is_reverted_normal else "Adversarial"
-        detection_result = f"Original image: {original_result} (Confidence: {confidence:.2f})\n"
-        detection_result += f"Reverted image: {reverted_result} (Confidence: {reverted_confidence:.2f})"
-
-        logging.info(detection_result)
-        print(detection_result)
+        logging.info(f"Original image classification: {original_result} (Confidence: {confidence:.2f})")
+        logging.info(f"Reverted image classification: {reverted_result} (Confidence: {reverted_confidence:.2f})")
+        print(f"Original image classification: {original_result} (Confidence: {confidence:.2f})")
+        print(f"Reverted image classification: {reverted_result} (Confidence: {reverted_confidence:.2f})")
 
         plt.figure(figsize=(10, 5))
         plt.subplot(1, 2, 1)
@@ -175,12 +167,10 @@ def main(train_dir, val_dir, uploaded_image_path):
         plt.subplot(1, 2, 2)
         plt.imshow(reverted_image[0] / 2 + 0.5)  # Denormalize
         plt.title(f"Reverted Image\n{reverted_result} (Conf: {reverted_confidence:.2f})")
-        plt.savefig(output_path)
+        plt.savefig('generatedimages/detected_reverted.png')
         plt.close()
 
-        logging.info(f"Detection and reversion completed. Result saved as {output_filename}")
-        return detection_result, output_filename
-
+        logging.info("Detection and reversion completed.")
     except Exception as e:
         logging.error(f"An error occurred: {str(e)}")
         raise

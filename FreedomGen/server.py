@@ -86,16 +86,21 @@ def handle_detect():
     print("Script stdout:", result.stdout)
     print("Script stderr:", result.stderr)
 
-    # Extract the adversarial detection result and output filename
+    # Check if images were created
+    image_paths = [
+        'generatedimages/detected_reverted.png',
+    ]
+
+    existing_images = ['uploads/' + filename] + [path for path in image_paths if os.path.exists(path)]
+
+    # Extract the adversarial detection result
     detection_result = "Unknown"
-    output_filename = None
     for line in result.stdout.split('\n'):
         if line.startswith("Original image:"):
-            detection_result = line + "\n"
+            detection_result = line + "\n"  # Start with the original image result
         elif line.startswith("Reverted image:"):
-            detection_result += line
-        elif line.startswith("Detection and reversion completed. Result saved as"):
-            output_filename = line.split("Result saved as ")[-1].strip()
+            detection_result += line  # Add the reverted image result
+            break
 
     if result.returncode != 0:
         return jsonify({
@@ -109,7 +114,7 @@ def handle_detect():
         'filename': filename,
         'script_output': result.stdout,
         'script_error': result.stderr,
-        'images': [f'generatedimages/{output_filename}'] if output_filename else [],
+        'images': existing_images,
         'adversarial_result': detection_result
     }), 200
 
