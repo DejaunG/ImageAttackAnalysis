@@ -231,3 +231,8 @@ h3 {
         padding: 1rem;
     }
 }
+
+.navbar-logo {
+    height: 40px; /* Adjust height to your preference */
+    margin-right: 10px; /* Space between logo and text */
+}

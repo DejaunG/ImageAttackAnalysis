@@ -40,36 +40,48 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(data) {
-    console.log('Server response:', data);
-    $(imageSelector).attr('src', '/uploads/' + data.filename).hide().fadeIn();
+                console.log('Server response:', data);
 
-    // Clear previous results
-    $(resultsSelector).empty();
+                // Display uploaded (raw) image
+                $(imageSelector).attr('src', '/uploads/' + data.filename).hide().fadeIn();
 
-    // Display results
-    data.images.forEach(function(image, index) {
-        if (image.includes('detected_reverted.png')) {
-            $(resultsSelector).append(`
-                <img src="/${image}" alt="Detected and Reverted Image" class="img-fluid mb-3">
-            `).hide().fadeIn();
-        }
-    });
+                // Clear previous results
+                $(resultsSelector).empty();
 
-    // Display adversarial detection result
-    if (data.adversarial_result) {
-        $(resultsSelector).append(`
-            <div class="adversarial-result">
-                <h3>Adversarial Detection Result</h3>
-                <pre>${data.adversarial_result}</pre>
-            </div>
-        `).hide().fadeIn();
-    }
+                // Display adversarial examples
+                data.images.forEach(function(image) {
+                    if (image.includes('adversarial_examples.png')) {
+                        let imgElement = $('<img>')
+                            .attr('src', '/' + image)
+                            .addClass('img-fluid mb-3')
+                            .attr('alt', 'Adversarial Examples');
+                        $(resultsSelector).append(imgElement);
+                    }
+                });
 
-    console.log('Success:', data);
-},
+                // Display training history if available
+                if (historySelector) {
+                    let historyImg = data.images.find(img => img.includes('training_history.png'));
+                    if (historyImg) {
+                        $(historySelector).attr('src', '/' + historyImg).hide().fadeIn();
+                    }
+                }
+
+                // Display adversarial detection result
+                if (data.adversarial_result) {
+                    $(resultsSelector).append(`
+                        <div class="adversarial-result">
+                            <h3>Adversarial Detection Result</h3>
+                            <pre>${data.adversarial_result}</pre>
+                        </div>
+                    `);
+                }
+
+                console.log('Success:', data);
+            },
             error: function(xhr, status, error) {
-                $('#response').html(`<strong>Error:</strong> ${xhr.responseText}`).fadeIn().delay(3000).fadeOut();
-                console.log('Error:', error);
+                $('#response').html(`<strong>Error:</strong> ${xhr.responseText || error}`).fadeIn().delay(3000).fadeOut();
+                console.error('Error:', error);
             },
             complete: function() {
                 // Hide loading modal
