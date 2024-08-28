@@ -30,7 +30,7 @@ def handle_upload():
     file.save(file_path)
 
     print("Running fgsm_adv.py script...")
-    python_path = sys.executable  # Use the current Python interpreter
+    python_path = sys.executable
     train_dir = 'Fish-DataSets/fish/train'
     val_dir = 'Fish-DataSets/fish/val'
     result = subprocess.run([python_path, 'fgsm_adv.py', train_dir, val_dir, file_path],
