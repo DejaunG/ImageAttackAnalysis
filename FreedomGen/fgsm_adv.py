@@ -143,7 +143,7 @@ def process_single_image(image_path, model, epsilon_values=[0, 0.01, 0.1, 0.15, 
     img_array = preprocess_input(img_array[np.newaxis, ...])
 
     original_pred = model.predict(img_array)
-    class_names = ['fresh', 'non-fresh']  # Update these to match your actual class names
+    class_names = ['fresh', 'non-fresh']  # Dataset Class Names
     original_label = class_names[np.argmax(original_pred)]
     original_prob = np.max(original_pred)
 
